@@ -1,0 +1,2 @@
+# Kincony.GCMP
+smart home
