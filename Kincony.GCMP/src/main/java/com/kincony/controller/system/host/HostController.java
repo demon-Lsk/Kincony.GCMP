@@ -426,16 +426,17 @@ public class HostController extends BaseController {
 			String filePath = PathUtil.getClasspath() + Const.FILEPATHFILE;								//文件上传路径
 			String fileName =  FileUpload.fileUp(file, filePath, "hostssd");							//执行上传
 			
-			List<PageData> listPd = (List)ObjectExcelRead.readExcel(filePath, fileName, 2, 0,0);	//执行读EXCEL操作,读出的数据导入List 2:从第3行开始；0:从第A列开始；0:第0个sheet
+			List<PageData> listPd = (List)ObjectExcelRead.readExcel(filePath, fileName, 1, 0,0);	//执行读EXCEL操作,读出的数据导入List 2:从第2行开始；0:从第A列开始；0:第0个sheet
 			
 			/*存入数据库操作======================================*/
 			/**
 			 * var0 :主机序列号
 			 * var1 :
 			 */
-			System.err.println("导入大小: "+listPd.size());
+			//System.err.println("导入大小: "+listPd.size());
+			logger.info(String.format("从Excel读入%s条设备信息", listPd.size()));
 			
-			if(listPd.size()>=1){
+			//if(listPd.size()>=1){
 				for(int i=0;i<listPd.size();i++){		
 					pd.put("HOST_ID", this.get32UUID());
 					pd.put("STATUS", "0");
@@ -446,14 +447,22 @@ public class HostController extends BaseController {
 					pd.put("HOST_NUMBER", listPd.get(i).getString("var1"));
 					pd.put("DEVICE_NAME", listPd.get(i).getString("var2"));
 					if(hostService.findByDeviceCode(listPd.get(i).getString("var0"))!=null){
+						logger.info(String.format("设备信息已存在, DeviceCode:%s, HostNumber:%s, DeviceName:%s", 
+								listPd.get(i).getString("var0"),
+								listPd.get(i).getString("var1"),
+								listPd.get(i).getString("var2")));
 						continue;
 					}
 					hostService.save(pd);
+					logger.info(String.format("设备信息保存成功, DeviceCode:%s, HostNumber:%s, DeviceName:%s", 
+							listPd.get(i).getString("var0"),
+							listPd.get(i).getString("var1"),
+							listPd.get(i).getString("var2")));
 				}
 				mv.addObject("msg","success");
-			}else{
-				mv.addObject("msg","two");
-			}
+			//}else{
+				//mv.addObject("msg","two");
+			//}
 			/*存入数据库操作======================================*/
 			
 			
