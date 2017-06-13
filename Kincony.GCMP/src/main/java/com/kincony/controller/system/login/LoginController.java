@@ -100,7 +100,8 @@ public class LoginController extends BaseController {
  		PageData pd = new PageData();
 		pd = this.getPageData();
 		pd.put("SYSNAME", Tools.readTxtFile(Const.SYSNAME)); //读取系统名称
-		mv.setViewName("system/admin/login");
+		//mv.setViewName("system/admin/login");
+		mv.setViewName("system/login/login");
 		mv.addObject("pd",pd);
 		return mv;
 	}
