@@ -1,2 +1,3 @@
 # Kincony.GCMP
-smart home
+A Kincony SmartHome product
+GCMP - Gateway Centralized Management Portal
