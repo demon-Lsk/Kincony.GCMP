@@ -176,13 +176,13 @@ public class PacketProcessHelper{
 
 		String deviceCode = in.getDevId();
 		DockUser user = userManager.getUser(deviceCode);
-		logger.info("" + (user == null));
 		
 		if (user == null) {
+			logger.info("服务器内存中没有该设备信息，重新注册设备。设备序列号：" + deviceCode + " 设备IP：" + hostName);
 			PageData findByDeviceCode = hostService.findByDeviceCode(deviceCode);
-			System.err.println(findByDeviceCode);
+			//System.err.println(findByDeviceCode);
 			if (findByDeviceCode!=null) {
-				// 注册在线用户
+				// 注册在线设备
 				userManager.addUser(deviceCode, new Date(), hostName, port);
 				packetProcessor.addSocketAddress(deviceCode, new String[] {
 						hostName, "" + port });
@@ -192,9 +192,11 @@ public class PacketProcessHelper{
 				map.put("STATUS","1");
 				hostService.editStatus(map);
 			} else {
+				logger.info("找不到设备信息，设备序列号：" + deviceCode + " 设备IP：" + hostName);
 				ret = 0;
 			}
 		} else {
+			logger.info("服务器内存中已存在该设备信息，更新在线状态。设备序列号：" + deviceCode + "设备IP：" + hostName);
 			ret = 1;
 			user.setStatus(1);
 
