@@ -390,7 +390,6 @@ public class Util {
 			case Protocol.MSG_DEV_REG:
 				return "MSG_DEV_REG";
 			case Protocol.MSG_DEV_REG_RE:
-				System.err.println("发了");
 				return "MSG_DEV_REG_RE";
 			case Protocol.MSG_DEV_HEART_BEAT:
 				return "MSG_DEV_HEART_BEAT";
