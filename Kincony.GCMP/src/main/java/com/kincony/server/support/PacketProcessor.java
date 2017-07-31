@@ -152,7 +152,6 @@ public class PacketProcessor implements IPacketListener {
 
 		// 判断是否连接
 		if(channel != null){
-			System.err.println("进了");
 			channel.write(packet, new InetSocketAddress(packet.getHostName(), packet.getPort()));
 			logger.info("发送包" + Util.getCommandString(packet.getCommand()) + "　devId：" + packet.getDevId() + " ip:"+packet.getHostName()+ " port:"+packet.getPort());
 			//packet.setTimeout(System.currentTimeMillis() + Protocol.TIMEOUT_SEND);

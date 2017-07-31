@@ -163,6 +163,7 @@ public class PacketProcessHelper{
 	 * @param in
 	 * @throws Exception 
 	 */
+	/*
 	public void processLoginSuccess(InPacket in) throws Exception {
 		logger.info("开始处理设备登录");
 
@@ -176,13 +177,13 @@ public class PacketProcessHelper{
 
 		String deviceCode = in.getDevId();
 		DockUser user = userManager.getUser(deviceCode);
-		logger.info("" + (user == null));
 		
 		if (user == null) {
+			logger.info("服务器内存中没有该设备信息，重新注册设备。设备序列号：" + deviceCode + " 设备IP：" + hostName);
 			PageData findByDeviceCode = hostService.findByDeviceCode(deviceCode);
-			System.err.println(findByDeviceCode);
+			//System.err.println(findByDeviceCode);
 			if (findByDeviceCode!=null) {
-				// 注册在线用户
+				// 注册在线设备
 				userManager.addUser(deviceCode, new Date(), hostName, port);
 				packetProcessor.addSocketAddress(deviceCode, new String[] {
 						hostName, "" + port });
@@ -192,13 +193,15 @@ public class PacketProcessHelper{
 				map.put("STATUS","1");
 				hostService.editStatus(map);
 			} else {
+				logger.info("找不到设备信息，设备序列号：" + deviceCode + " 设备IP：" + hostName);
 				ret = 0;
 			}
 		} else {
+			logger.info("服务器内存中已存在该设备信息，更新在线状态。设备序列号：" + deviceCode + "设备IP：" + hostName);
 			ret = 1;
 			user.setStatus(1);
 
-			/*boProcessService.doLogin(deviceCode, hostName);*/
+			//boProcessService.doLogin(deviceCode, hostName);
 			userManager.addUser(deviceCode, new Date(), hostName, port);
 			packetProcessor.addSocketAddress(deviceCode, new String[] {
 					hostName, "" + port });
@@ -207,6 +210,44 @@ public class PacketProcessHelper{
 		logger.info("注册设备序列号:" + deviceCode + " 设备注册! ip " + hostName + " 状态 "
 				+ ret);
 
+		LoginReplyPacket reply = new LoginReplyPacket(deviceCode, ret);
+		reply.setHostName(hostName);
+		reply.setPort(port);
+		packetProcessor.sendStrategy(reply);
+	}
+	*/
+	
+	public void processLoginSuccess(InPacket in) throws Exception {
+		logger.info("开始处理设备登录");
+
+		String deviceCode = in.getDevId();
+		PageData device = hostService.findByDeviceCode(deviceCode);
+		String hostName = in.getHostName();
+		int port = in.getPort();
+		
+		int ret = 0;
+		
+		if (device == null) {
+			logger.info("找不到设备信息，登录失败。设备序列号：" + deviceCode + " 设备IP：" + in.getHostName());
+			ret = 0;
+		} else {
+			DockUser user = userManager.getUser(deviceCode);
+			if (user == null) {
+				logger.info("服务器内存中没有该设备信息，重新注册设备。设备序列号：" + deviceCode + " 设备IP：" + hostName);
+							
+				userManager.addUser(deviceCode, new Date(), hostName, port);
+			}
+			
+			logger.info("更新设备状态为在线，设备序列号：" + deviceCode + " 设备IP：" + hostName);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("DEVICE_CODE", deviceCode);
+			map.put("STATUS","1");
+			hostService.editStatus(map);
+			
+			packetProcessor.addSocketAddress(deviceCode, new String[] { hostName, String.valueOf(port) });
+			ret = 1;
+		}
+		
 		LoginReplyPacket reply = new LoginReplyPacket(deviceCode, ret);
 		reply.setHostName(hostName);
 		reply.setPort(port);
